@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Secrets and Config ###
+application.properties
+# application.yml (if you use YAML)
+
 ### STS ###
 .apt_generated
 .classpath
