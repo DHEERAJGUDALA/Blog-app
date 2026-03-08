@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -50,6 +52,36 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false, 
                 foreignKey = @ForeignKey(name = "fk_post_user"))
     private User author;
+
+    // ===== @OneToMany: A post can have MANY comments =====
+    // This is the NON-OWNING side (Comment has the foreign key).
+    // "mappedBy" means the "post" field in Comment OWNS this relationship.
+    //
+    // cascade = CascadeType.ALL:
+    //   - When saving/deleting a Post, automatically save/delete its Comments
+    //
+    // orphanRemoval = true:
+    //   - If a Comment is removed from this list, delete it from DB
+    //
+    // fetch = FetchType.LAZY:
+    //   - Don't load comments when loading a Post
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>();
+
+    // ===== @ManyToMany: A post can have MANY tags =====
+    // This is the OWNING side — defines the join table
+    //
+    // @JoinTable:
+    //   - name = "post_tags" → join table name
+    //   - joinColumns = post_id → this entity's column in join table
+    //   - inverseJoinColumns = tag_id → the Tag's column in join table
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "post_tags",
+        joinColumns = @JoinColumn(name = "post_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags = new ArrayList<>();
 
     // ===== LIFECYCLE CALLBACKS =====
     @PrePersist
