@@ -75,7 +75,9 @@ public class Post {
     //   - name = "post_tags" → join table name
     //   - joinColumns = post_id → this entity's column in join table
     //   - inverseJoinColumns = tag_id → the Tag's column in join table
-    @ManyToMany(fetch = FetchType.LAZY)
+    // cascade PERSIST & MERGE only — saving a post saves new tags too,
+    // but deleting a post does NOT delete tags (other posts may use them)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "post_tags",
         joinColumns = @JoinColumn(name = "post_id"),
